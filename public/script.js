@@ -1,25 +1,30 @@
 let devMode = false; // Development mode flag
 let isLoggedIn = false; // Track the user's login state
 
-// Function to open a window by ID and position it near the clicked button
-function openWindow(windowId, button) {
-    const windowElement = document.getElementById(windowId);
+// Login form handling
+document.getElementById('login-form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
 
-    if (!windowElement.dataset.loaded) {
-        fetch(`${windowId}.html`)
-            .then(response => response.text())
-            .then(html => {
-                windowElement.innerHTML = html;
-                windowElement.dataset.loaded = "true"; // Set as loaded
+    try {
+        const response = await fetch('/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
 
-                // Position the window relative to the button
-                positionWindow(windowElement, button);
-            })
-            .catch(error => console.error(`Error loading ${windowId}:`, error));
-    } else {
-        positionWindow(windowElement, button);
+        if (response.ok) {
+            const data = await response.json();
+            isLoggedIn = true; // Set login state to true
+            restoreWindows(data.openWindows); // Restore windows after successful login
+        } else {
+            alert('Login failed');
+        }
+    } catch (error) {
+        console.error('Error logging in:', error);
     }
-}
+});
 
 // Set the window position relative to the clicked button
 function positionWindow(windowElement, button) {
@@ -27,16 +32,11 @@ function positionWindow(windowElement, button) {
         console.error("Positioning failed: button is undefined.");
         return;
     }
-    
+
     const rect = button.getBoundingClientRect();
     windowElement.style.top = (rect.top + window.scrollY + 10) + "px";
     windowElement.style.left = (rect.left + window.scrollX + 10) + "px";
     windowElement.style.display = 'block';
-}
-
-// Function to close a window by ID
-function closeWindow(windowId) {
-    document.getElementById(windowId).style.display = 'none';
 }
 
 // Function to enable dragging of elements
@@ -157,30 +157,6 @@ function dragEnd(event) {
 // Call generateGrid to initialize the grid
 generateGrid();
 
-// Login form handling
-document.getElementById('login-form').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
-
-    try {
-        const response = await fetch('/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password })
-        });
-
-        if (response.ok) {
-            const data = await response.json();
-            restoreWindows(data.openWindows); // Restore windows after successful login
-        } else {
-            alert('Login failed');
-        }
-    } catch (error) {
-        console.error('Error logging in:', error);
-    }
-});
-
 // Function to restore windows based on saved state
 function restoreWindows(openWindows) {
     openWindows.forEach(windowId => {
@@ -191,6 +167,11 @@ function restoreWindows(openWindows) {
 
 // Function to update open windows state on the server
 async function updateOpenWindows() {
+    if (!isLoggedIn) {
+        console.error('User is not logged in. Cannot update open windows.');
+        return; // Exit the function if the user is not logged in
+    }
+
     const openWindows = Array.from(document.querySelectorAll('.sub-window'))
         .filter(window => window.style.display === 'block')
         .map(window => window.id);
@@ -198,7 +179,10 @@ async function updateOpenWindows() {
     try {
         await fetch('/update-windows', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                // 'Authorization': `Bearer ${yourAccessToken}`, // Uncomment this line if using auth
+            },
             body: JSON.stringify({ openWindows })
         });
     } catch (error) {
@@ -206,55 +190,86 @@ async function updateOpenWindows() {
     }
 }
 
-// Modify openWindow to also update open windows
 async function openWindow(windowId, button) {
     const windowElement = document.getElementById(windowId);
 
     if (!windowElement.dataset.loaded) {
-        fetch(`${windowId}.html`)
-            .then(response => response.text())
-            .then(html => {
-                windowElement.innerHTML = html;
-                windowElement.dataset.loaded = "true"; // Set as loaded
+        try {
+            const response = await fetch(`${windowId}.html`);
+            const html = await response.text();
+            windowElement.innerHTML = html;
+            windowElement.dataset.loaded = "true"; // Set as loaded
 
-                positionWindow(windowElement, button);
-            })
-            .catch(error => console.error(`Error loading ${windowId}:`, error));
+            positionWindow(windowElement, button);
+
+            // Register event listener if it's the signup window
+            if (windowId === 'window-signup') {
+                const signupForm = document.getElementById('signup-form'); // Get the signup form
+                if (signupForm) { // Check if the form exists
+                    signupForm.addEventListener('submit', handleSignup);
+                } else {
+                    console.error("Signup form not found."); // Log if not found
+                }
+            }
+
+        } catch (error) {
+            console.error(`Error loading ${windowId}:`, error);
+        }
     } else {
         positionWindow(windowElement, button);
     }
 
-    await updateOpenWindows(); // Update open windows after opening a new one
+    // Only update open windows if the user is logged in
+    if (isLoggedIn) {
+        await updateOpenWindows(); // Update open windows after opening a new one
+    }
 }
 
-// Modify closeWindow to also update open windows
-async function closeWindow(windowId) {
+// Close window function
+function closeWindow(windowId) {
     document.getElementById(windowId).style.display = 'none';
-    await updateOpenWindows(); // Update open windows after closing
 }
 
-// Event listener for sign-up form submission
-document.getElementById('signup-form').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    
+// Function to handle signup
+async function handleSignup(event) {
+    event.preventDefault(); // Prevent the default form submission behavior
+
     const username = document.getElementById('signup-username').value;
     const password = document.getElementById('signup-password').value;
 
+    // Get the current date and time for createdAt and updatedAt
+    const currentDate = new Date().toISOString(); // Use ISO format for consistency
+
     try {
-        const response = await fetch('/signup', {
+        const response = await fetch('http://localhost:3000/signup', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password })
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+                id,
+                username, 
+                password,
+                createdAt: currentDate,  // Include createdAt
+                updatedAt: currentDate   // Include updatedAt
+            }),
         });
 
         if (response.ok) {
-            alert('Sign up successful! You can now log in.');
-            closeWindow('window-signup'); // Close the sign-up window
+            const result = await response.json();
+            alert(result.message);
+            closeWindow('window-signup'); // Optionally close the signup window
         } else {
-            const errorData = await response.json();
-            alert(`Sign up failed: ${errorData.message}`);
+            const error = await response.json();
+            alert(error.message || 'Signup failed');
         }
     } catch (error) {
-        console.error('Error during sign up:', error);
+        console.error('Error during signup:', error);
+        alert('An error occurred while signing up.');
     }
-});
+}
+
+// Additional code and functions...
+
+// Call this to ensure the signup form listener is registered only when the window is opened
+// document.getElementById('signup-form').addEventListener('submit', handleSignup);

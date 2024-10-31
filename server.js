@@ -1,99 +1,101 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const sqlite3 = require('sqlite3').verbose();
 const bcrypt = require('bcrypt');
 const session = require('express-session'); // Import express-session
 const path = require('path'); // Import path for file serving
+const { User, syncDatabase } = require('./models/user');
+const sequelize = require('./db'); // Import the sequelize instance
+require('dotenv').config();
+
+
+// Sync the models with the database
+sequelize.sync()
+    .then(() => {
+        console.log('Database & tables created!');
+    })
+    .catch(err => {
+        console.error('Error syncing database:', err);
+    });
 
 const app = express();
 const PORT = 3000;
 
 // Middleware
 app.use(bodyParser.json());
-app.use(express.static('public')); // Serve static files
-
-// Session middleware
 app.use(session({
-    secret: 'your-secret-key', // Replace with your secret key
+    secret: 'Filmlover17',
     resave: false,
     saveUninitialized: true,
 }));
 
-// Initialize SQLite database
-const db = new sqlite3.Database('./users.db', (err) => {
-    if (err) {
-        console.error(err.message);
-    } else {
-        db.run(`CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT UNIQUE,
-            password TEXT
-        )`, (err) => {
-            if (err) {
-                console.error(err.message);
-            }
+// Serve static files if needed
+app.use(express.static('public')); 
+
+// Sign up route
+app.post('/signup', async (req, res) => {
+    const { username, password } = req.body;
+
+    try {
+        // Hash the password before storing it
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Create a new user
+        const user = await User.create({
+            username,
+            password: hashedPassword, // Store hashed password
+            createdAt: new Date(),
+            updatedAt: new Date()
         });
+
+        res.status(201).json({ message: 'User registered successfully', userId: user.id });
+    } catch (error) {
+        console.error('Error during signup:', error);
+        if (error.name === 'SequelizeUniqueConstraintError') {
+            return res.status(409).json({ message: 'Username already exists' });
+        }
+        res.status(500).json({ message: 'An error occurred during signup' });
     }
+});
+
+// Login route (optional)
+app.post('/login', async (req, res) => {
+    const { username, password } = req.body;
+
+    try {
+        // Find the user by username
+        const user = await User.findOne({ where: { username } });
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Compare the provided password with the stored hashed password
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+
+        if (!isPasswordValid) {
+            return res.status(401).json({ message: 'Invalid password' });
+        }
+
+        res.status(200).json({ message: 'Login successful', userId: user.id });
+    } catch (error) {
+        console.error('Error during login:', error);
+        res.status(500).json({ message: 'An error occurred during login' });
+    }
+});
+
+// Logout endpoint
+app.post('/logout', (req, res) => {
+    req.session.destroy(err => {
+        if (err) {
+            return res.status(500).json({ message: 'Error logging out' });
+        }
+        res.status(200).json({ message: 'Logout successful' });
+    });
 });
 
 // Route to serve index.html
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-// Sign-up endpoint
-app.post('/signup', (req, res) => {
-    const { username, password } = req.body;
-
-    if (!username || !password) {
-        return res.status(400).json({ message: 'Username and password are required.' });
-    }
-
-    // Hash password for security
-    bcrypt.hash(password, 10, (err, hash) => {
-        if (err) {
-            return res.status(500).json({ message: 'Error hashing password.' });
-        }
-
-        // Insert user into database
-        db.run(`INSERT INTO users (username, password) VALUES (?, ?)`, [username, hash], function(err) {
-            if (err) {
-                if (err.code === 'SQLITE_CONSTRAINT') {
-                    return res.status(400).json({ message: 'Username already taken.' });
-                }
-                return res.status(500).json({ message: 'Error saving user.' });
-            }
-
-            res.status(201).json({ message: 'User created successfully.' });
-        });
-    });
-});
-
-// Login endpoint
-app.post('/login', (req, res) => {
-    const { username, password } = req.body;
-
-    // Query the database for the user
-    db.get(`SELECT * FROM users WHERE username = ?`, [username], (err, user) => {
-        if (err) {
-            return res.status(500).send('Database error.');
-        }
-        if (!user) {
-            return res.status(401).send('Unauthorized');
-        }
-
-        // Compare hashed password
-        bcrypt.compare(password, user.password, (err, result) => {
-            if (err || !result) {
-                return res.status(401).send('Unauthorized');
-            }
-
-            // Store user information in session
-            req.session.user = { id: user.id, username: user.username };
-            req.session.openWindows = req.session.openWindows || []; // Initialize if not set
-            res.json({ openWindows: req.session.openWindows });
-        });
-    });
 });
 
 // Store open windows on the server
