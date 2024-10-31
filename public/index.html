@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Draggable Windows</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body class="crt">
+    <div class="distortion-line"></div>
+    <div class="scanlines"></div>
+    <div class="content">
+        <!-- Login Form -->
+        <div id="login-container">
+            <h2>Login</h2>
+            <form id="login-form">
+                <input type="text" id="username" placeholder="Username" required>
+                <input type="password" id="password" placeholder="Password" required>
+                <button type="submit">Login</button>
+            </form>
+        </div>
+
+        <!-- Button to Open Sign-Up Window -->
+        <button class="button-signup" id="signup-button" onclick="openWindow('window-signup', this)">Sign Up</button>
+
+        <!-- Logout Button -->
+        <button class="root button-main" id="logout-button" style="display: none;" onclick="logout()">Logout</button>
+
+        <!-- Existing Button to Open Galaxy Window -->
+        <button class="root button-main" onclick="openWindow('window-galaxy', this)">GalaxOs</button>
+
+        <!-- Empty divs for each sub-window -->
+        <div id="window-galaxy" class="sub-window window-galaxy" style="display: none;"></div>
+        <div id="window-parliament" class="sub-window window-parliament" style="display: none;"></div>
+        <div id="window-Cooperative-HQ" class="sub-window window-Cooperative-HQ" style="display: none;"></div>
+        <div id="window-meeting-room" class="sub-window window-meeting-room" style="display: none;"></div>
+        <div id="window-signup" class="sub-window" style="display: none;"></div> <!-- Placeholder for Sign-Up Window -->
+        <div id="grid-wrapper" style="display: none;"></div>
+    </div>
+
+    <button class="dev-button" onclick="toggleDevMode()">Toggle Dev Mode</button>
+    <div id="cursor-position">
+        Cursor Position: <span id="cursor-percent"></span>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+

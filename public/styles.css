@@ -1,0 +1,345 @@
+body {
+    background-color: #ffffe6; /* Light background color */
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100vh; /* Full viewport height */
+    display: flex; /* Flex container for centering content */
+    align-items: center; /* Center content vertically */
+    justify-content: center; /* Center content horizontally */
+    font-family: 'Orbitron', sans-serif;
+    
+    /* Background image and grid */
+    background-image: 
+        url('GalaxOs Lines Logo.png'), 
+        radial-gradient(circle, rgba(0, 0, 0, 0.507) 1px, transparent 1px);
+    
+    /* Adjust size and position to stretch off the top and bottom */
+    background-size: 150% 150%, 20px 20px; /* Logo covers the full width and 150% height */
+    background-position: left bottom, center; /* Center the logo image */
+    background-repeat: no-repeat, repeat; /* Prevent image repeat, but repeat the grid */
+    overflow: hidden; /* Hide any overflow if needed */
+}
+
+.galaxy {
+    width: 2500px;
+    height: 1500px;
+}
+
+.button-main {
+    position: absolute; /* Absolute positioning for buttons */
+    background-color: #ffffe6;
+    width: 250px;
+    height: 50px;
+    border-color: transparent;
+    font-family: 'Orbitron', sans-serif;
+}
+
+.root {
+    font-size: xx-large;
+}
+
+.button-signup {
+    position: absolute; /* Absolute positioning for buttons */
+    background-color: #ffffe6;
+    top: 10px;
+    width: 250px;
+    height: 50px;
+    border-color: transparent;
+    font-family: 'Orbitron', sans-serif;
+}
+
+.closewindow {
+    right: 3%;
+}
+
+.sub-window {
+    position: absolute;
+    width: 300px;
+    height: 200px;
+    background-color: #ffffe6;
+    border: 1px solid #ddd;
+    border-radius: 2px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    overflow: hidden; /* Prevent overflow of content */
+    /* Removed resize: both; */
+    min-width: 150px;
+    min-height: 100px;
+}
+
+/* Removed resize-handle styles */
+
+.window-galaxy {
+    position: absolute;
+    width: 1800px;
+    height: 1000px;
+    background-color: #ffffe6;
+    border: 1px solid #ddd;
+    border-radius: 2px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    overflow: hidden; /* Prevent overflow of content */
+    /* Removed resize: both; */
+    min-width: 150px;
+    min-height: 100px;
+}
+
+.window-parliament {
+    position: absolute;
+    width: 1024px;
+    height: 529.5px;
+    background-color: #ffffe6;
+    border: 1px solid #ddd;
+    border-radius: 2px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    overflow: hidden; /* Prevent overflow of content */
+    /* Removed resize: both; */
+    min-width: 150px;
+    min-height: 100px;
+}
+
+.window-Cooperative-HQ {
+    position: absolute;
+    width: 1024px;
+    height: 1024px;
+    background-color: #ffffe6;
+    border: 1px solid #ddd;
+    border-radius: 2px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    overflow: hidden; /* Prevent overflow of content */
+    /* Removed resize: both; */
+    min-width: 150px;
+    min-height: 100px;
+}
+
+.window-meeting-room {
+    position: absolute;
+    width: 1024px;
+    height: 1024px;
+    background-color: #ffffe6;
+    border: 1px solid #ddd;
+    border-radius: 2px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    overflow: hidden; /* Prevent overflow of content */
+    /* Removed resize: both; */
+    min-width: 150px;
+    min-height: 100px;
+}
+
+.image-container {
+    position: relative;
+    width: 500px;  /* Fixed width for the container */
+    height: 300px; /* Fixed height for the container */
+    overflow: auto; /* Enable scroll bars when content overflows */
+    border: 1px solid #ccc; /* Optional: add a border for visibility */
+}
+
+.image-container-1 {
+    position: relative;
+    width: 1800px;  /* Fixed width for the container */
+    height: 1000px; /* Fixed height for the container */
+    overflow: auto; /* Enable scroll bars when content overflows */
+    border: 1px solid #ccc; /* Optional: add a border for visibility */
+}
+
+.responsive-image {
+    width: auto;  /* Set width to auto to maintain aspect ratio */
+    height: 100%; /* Ensure image fills the height of the container */
+    display: block; /* Ensure it behaves as a block element */
+}
+
+.lore-button {
+    border-color: transparent;
+    font-family: 'Orbitron', sans-serif;
+    background-color: #91ff9d;
+}
+
+.lore-button:hover {
+    border-color: transparent;
+    font-family: 'Orbitron', sans-serif;
+    background-color: #44f859;
+}
+
+.lore-button-Parliament {
+    position: absolute;
+    bottom: 536px; /* Adjust for desired vertical positioning */
+    left: 1132px; /* Adjust for desired horizontal positioning */
+    border-color: transparent;
+    font-family: 'Orbitron', sans-serif;
+    background-color: #91ff9d;
+}
+
+.lore-button-Cooperative-HQ {
+position: absolute;
+bottom: 218px;
+left: 240px;
+}
+
+.lore-button-meeting-room {
+position: absolute;
+left: 295px;
+top: 364.5px;
+}
+
+.header {
+    background-color: #91ff9d;
+    color: #fff;
+    padding: 8px;
+    cursor: move;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header button {
+    background-color: red;
+    width: 20px;
+    height: 20px;
+    border: none;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.sub-window img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+.sub-window a {
+    display: block;
+    padding: 10px;
+    color: #333;
+    font-weight: bold;
+    text-decoration: none;
+    text-align: center;
+}
+
+.resize-handle {
+    position: absolute;
+    width: 15px;
+    height: 15px;
+    bottom: 0;
+    right: 0;
+    cursor: se-resize;
+}
+
+.draggable-button {
+    position: absolute;
+    cursor: pointer;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+}
+
+#cursor-position {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 5px;
+    border-radius: 5px;
+    display: none; /* Hidden by default */
+    z-index: 1000; /* Ensure it stays on top */
+}
+
+.dev-button {
+    position: fixed; /* Fix the button to the viewport */
+    top: 10px; /* Distance from the top of the viewport */
+    right: 10px; /* Distance from the right of the viewport */
+    padding: 10px 15px; /* Padding for a better look */
+    background-color: #ffffe6;
+    color: rgb(0, 0, 0); /* Button text color */
+    border: none; /* Remove border */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Change cursor to pointer */
+    font-size: 16px; /* Font size */
+    transition: background-color 0.3s; /* Transition effect */
+}
+
+.dev-button:hover {
+    background-color: #0056b3; /* Darker shade on hover */
+}
+
+  .crt::after {
+    content: " ";
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: rgba(18, 16, 16, 0.1);
+    opacity: 0;
+    z-index: 2;
+    pointer-events: none;
+    animation: flicker 0.15s infinite;
+  }
+  .crt::before {
+    content: " ";
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+    z-index: 2;
+    background-size: 100% 2px, 3px 100%;
+    pointer-events: none;
+  }
+
+  .crt {
+    animation: textShadow 1.6s infinite;
+  }
+
+.distortion-line {
+    position: absolute;
+    top: 0; /* Start at the top */
+    left: 50%; /* Center horizontally */
+    width: 100vw; /* Full width of the viewport */
+    height: 4px; /* Height of the distortion line */
+    background: linear-gradient(90deg, rgba(255,0,0,0.5), rgba(0,255,0,0.5), rgba(0,0,255,0.5)); /* Gradient for distortion effect */
+    opacity: 0.8; /* Adjust opacity for desired effect */
+    transform: translateX(-50%); /* Center the line */
+    animation: moveLine 15s linear infinite; /* Animation for moving effect with constant speed */
+    pointer-events: none; /* Allow clicks through */
+    z-index: 999;
+}
+
+@keyframes moveLine {
+    0% {
+        transform: translateY(0) translateX(-50%); /* Start at the top */
+    }
+    100% {
+        transform: translateY(100vh) translateX(-50%); /* Move to the bottom of the viewport */
+    }
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(10, 70px);
+    grid-template-rows: repeat(10, 70px);
+    gap: 2px;
+    width: 720px; /* Adjust to your grid size */
+    height: 720px;
+    position: relative;
+    margin: auto;
+}
+
+.grid-cell {
+    width: 70px;
+    height: 70px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    background-color: #f9f9f9;
+}
+
+.token {
+    width: 60px;
+    height: 60px;
+    background-color: #4CAF50;
+    border-radius: 50%;
+    cursor: grab;
+    position: absolute;
+}
