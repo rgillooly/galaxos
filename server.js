@@ -3,10 +3,9 @@ const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const session = require('express-session'); // Import express-session
 const path = require('path'); // Import path for file serving
-const { User, syncDatabase } = require('./models/user');
+const User = require('./models/User'); // Ensure this path is correct
 const sequelize = require('./db'); // Import the sequelize instance
 require('dotenv').config();
-
 
 // Sync the models with the database
 sequelize.sync()
@@ -18,68 +17,79 @@ sequelize.sync()
     });
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000; // Use environment variable for PORT
 
 // Middleware
 app.use(bodyParser.json());
 app.use(session({
-    secret: 'Filmlover17',
+    secret: process.env.SESSION_SECRET || 'Filmlover17', // Use environment variable for secret
     resave: false,
     saveUninitialized: true,
 }));
 
 // Serve static files if needed
 app.use(express.static('public')); 
+    
+    // Signup route
+    app.post('/signup', async (req, res) => {
+        try {
+            const { username, password } = req.body;
+    
+            // Create a new user
+            const newUser = await User.create({ username, password });
+            res.status(201).json({ message: 'Signup successful!', user: newUser });
+        } catch (error) {
+            console.error('Signup error:', error);
+            if (error.name === 'SequelizeUniqueConstraintError') {
+                return res.status(400).json({ message: 'Username already exists' });
+            }
+            res.status(500).json({ message: 'Signup failed' });
+        }
+    });
 
-// Sign up route
-app.post('/signup', async (req, res) => {
-    const { username, password } = req.body;
+    app.post('/login', async (req, res) => {
+        const { username, password } = req.body;
+    
+        try {
+            const user = await User.findOne({ where: { username } });
+    
+            if (!user) {
+                return res.status(404).json({ message: 'User not found' });
+            }
+    
+            const isPasswordValid = await bcrypt.compare(password, user.password);
+    
+            if (!isPasswordValid) {
+                return res.status(401).json({ message: 'Invalid password' });
+            }
+    
+            // Store user ID in session
+            req.session.user = { id: user.id, username: user.username };
+    
+            // Retrieve open windows from user data
+            const openWindows = user.openWindows || []; // This should be an array of window IDs
+    
+            res.status(200).json({ message: 'Login successful', userId: user.id, openWindows });
+        } catch (error) {
+            console.error('Error during login:', error);
+            res.status(500).json({ message: 'An error occurred during login' });
+        }
+    });    
 
+app.post('/update-windows', async (req, res) => {
+    if (!req.session.user) return res.status(401).send('Unauthorized');
+
+    const { openWindows } = req.body; // Expecting an array of window IDs
     try {
-        // Hash the password before storing it
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        // Create a new user
-        const user = await User.create({
-            username,
-            password: hashedPassword, // Store hashed password
-            createdAt: new Date(),
-            updatedAt: new Date()
+        await User.update({ openWindows }, {
+            where: {
+                id: req.session.user.id // Assuming you store user ID in the session
+            }
         });
-
-        res.status(201).json({ message: 'User registered successfully', userId: user.id });
+        res.sendStatus(200);
     } catch (error) {
-        console.error('Error during signup:', error);
-        if (error.name === 'SequelizeUniqueConstraintError') {
-            return res.status(409).json({ message: 'Username already exists' });
-        }
-        res.status(500).json({ message: 'An error occurred during signup' });
-    }
-});
-
-// Login route (optional)
-app.post('/login', async (req, res) => {
-    const { username, password } = req.body;
-
-    try {
-        // Find the user by username
-        const user = await User.findOne({ where: { username } });
-
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-
-        // Compare the provided password with the stored hashed password
-        const isPasswordValid = await bcrypt.compare(password, user.password);
-
-        if (!isPasswordValid) {
-            return res.status(401).json({ message: 'Invalid password' });
-        }
-
-        res.status(200).json({ message: 'Login successful', userId: user.id });
-    } catch (error) {
-        console.error('Error during login:', error);
-        res.status(500).json({ message: 'An error occurred during login' });
+        console.error('Error updating open windows:', error);
+        res.status(500).send('Error updating windows');
     }
 });
 

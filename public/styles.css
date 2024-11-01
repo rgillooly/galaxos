@@ -35,6 +35,25 @@ body {
     font-family: 'Orbitron', sans-serif;
 }
 
+.button-logout {
+    position: absolute; /* Absolute positioning for buttons */
+    background-color: #ffffe6;
+    width: 250px;
+    height: 50px;
+    border-color: 1px solid black;
+    font-family: 'Orbitron', sans-serif;
+    bottom: 50px;
+}
+
+.button-auth {
+    position: absolute; /* Absolute positioning for buttons */
+    background-color: #ffffe6;
+    width: 250px;
+    height: 50px;
+    border-color: 1px solid black;
+    font-family: 'Orbitron', sans-serif;
+}
+
 .root {
     font-size: xx-large;
 }
@@ -45,7 +64,7 @@ body {
     top: 10px;
     width: 250px;
     height: 50px;
-    border-color: transparent;
+    border-color: 1px solid black;
     font-family: 'Orbitron', sans-serif;
 }
 

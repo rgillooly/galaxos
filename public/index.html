@@ -7,28 +7,27 @@
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
 </head>
-<body class="crt">
-    <div class="distortion-line"></div>
-    <div class="scanlines"></div>
+<body>
     <div class="content">
         <!-- Login Form -->
-        <div id="login-container">
+        <div id="login-container" style="display: none;">
             <h2>Login</h2>
             <form id="login-form">
                 <input type="text" id="username" placeholder="Username" required>
                 <input type="password" id="password" placeholder="Password" required>
-                <button type="submit">Login</button>
+                <div class="auth-buttons">
+                    <button id="auth-button" class="button-auth" type="submit">Login</button>
+                </div>  
             </form>
         </div>
 
-        <!-- Button to Open Sign-Up Window -->
-        <button class="button-signup" id="signup-button" onclick="openWindow('window-signup', this)">Sign Up</button>
-
         <!-- Logout Button -->
-        <button class="root button-main" id="logout-button" style="display: none;" onclick="logout()">Logout</button>
+        <div id="logout-container" style="display: none;">
+            <button id="logout-button" class="button-auth" onclick="handleAuth()">Logout</button>
+        </div>
 
-        <!-- Existing Button to Open Galaxy Window -->
-        <button class="root button-main" onclick="openWindow('window-galaxy', this)">GalaxOs</button>
+        <!-- Button to Open Sign-Up Window -->
+        <button class="button-signup" id="signup-button" onclick="openWindow('window-signup', this)">Sign Up</button>       
 
         <!-- Empty divs for each sub-window -->
         <div id="window-galaxy" class="sub-window window-galaxy" style="display: none;"></div>
@@ -39,12 +38,11 @@
         <div id="grid-wrapper" style="display: none;"></div>
     </div>
 
-    <button class="dev-button" onclick="toggleDevMode()">Toggle Dev Mode</button>
+    <!-- <button class="dev-button" onclick="toggleDevMode()">Toggle Dev Mode</button>
     <div id="cursor-position">
         Cursor Position: <span id="cursor-percent"></span>
-    </div>
+    </div> -->
 
     <script src="script.js"></script>
 </body>
 </html>
-
